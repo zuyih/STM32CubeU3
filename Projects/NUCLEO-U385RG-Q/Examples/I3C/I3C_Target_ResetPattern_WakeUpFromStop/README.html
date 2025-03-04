@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../../../../_htmresc/mini-st_2020.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h2 id="i3c_target_resetpattern_wakeupfromstop-example-description"><b>I3C_Target_ResetPattern_WakeUpFromStop Example Description</b></h2>
+<p>How to handle I3C as Target to wake up from Stop, when Target receives a reset pattern.</p>
+<pre><code>  - Board: NUCLEO-U385RG (embeds a STM32U385RG device)
+  - SCL Pin: PB13 (Arduino D15/SCL CN5 pin 4, Morpho CN10 pin30)
+  - SDA Pin: PB14 (Arduino D14/SDA CN5 pin 5, Morpho CN10 pin28)
+  Connect GND between each board
+  Use short wire as possible between the boards or twist an independent ground wire on each I3C lines
+  mean one GND twist around SCL and one GND twist around SDA to help communication at 12.5Mhz.</code></pre>
+<p>At the beginning of the main program the HAL_Init() function is called to reset all the peripherals, initialize the Flash interface and the systick. Then the SystemClock_Config() function is used to configure the system clock (SYSCLK) to run at 96 MHz.</p>
+<p>The I3C peripheral configuration is ensured by the HAL_I3C_Init() function. This later is calling the HAL_I3C_MspInit()function which core is implementing the configuration of the needed I3C resources according to the used hardware (CLOCK, GPIO and NVIC). You may update this function to change I3C configuration.</p>
+<p>The project is split in two workspace: the Controller Board (I3C_Controller_ResetPattern_WakeUpFromStop) and the Target Board (I3C_Target_ResetPattern_WakeUpFromStop)</p>
+<ul>
+<li>Target Board</li>
+</ul>
+<p>On product STM32U3, the feature Reset Pattern is both functional on PWR peripheral side and on I3C peripheral. The PWR Reset Pattern detection is functional during low power phases. The I3C Reset Pattern detection is functional during run mode phases.</p>
+<p>The PWR Reset Pattern detection, help target to detect the Reset Pattern during the Stop, Standby mode.</p>
+<p>The HAL_I3C_Tgt_Config(), the HAL_I3C_SetConfigFifo(), and the HAL_I3C_ActivateNotification() functions allow respectively the configuration of the Target descriptor, the configuration of the internal hardware FIFOs and the enabling of Asynchronous catching event in Target mode using Interrupt.</p>
+<p>The HAL_Init() function is called to reset all the peripherals, initialize the Flash interface and the systick. Then the SystemClock_Config() function is used to configure the system clock (SYSCLK) to run at 96 MHz.</p>
+<p>The I3C peripheral configuration is ensured by the HAL_I3C_Init() function. This later is calling the HAL_I3C_MspInit()function which core is implementing the configuration of the needed I3C resources according to the used hardware (CLOCK, GPIO and NVIC). User may update this function to change I3C configuration.</p>
+<p>The first step enable the wake up line 9 for I3C1 through HAL_PWR_EnableWakeUpLine(), then Enable I3C pull-up() for SCL and SDA pins through HAL_PWREx_EnableI3CPullUp().</p>
+<p>Then Target goes to Low power Stop Mode through HAL_PWR_EnterStopMode().</p>
+<p>The I3C Controller start the communication by sending the reset pattern through HAL_I3C_Ctrl_GeneratePatterns() to I3C Target which is in Low power mode, then the Target wakeup from Stop mode.</p>
+<p>After wake up from Stop, the __HAL_PWR_GET_FLAG() function check Stop flag.</p>
+<p>NUCLEO-U385RG’s LEDs can be used to monitor the transfer status:</p>
+<ul>
+<li>LD2 toggle slowly when there is an error in transmission/reception process.</li>
+<li>LD2 ON when target wake up from Stop.</li>
+</ul>
+<h4 id="notes"><b>Notes</b></h4>
+<ol type="1">
+<li><p>Care must be taken when using HAL_Delay(), this function provides accurate delay (in milliseconds) based on variable incremented in SysTick ISR. This implies that if HAL_Delay() is called from a peripheral ISR process, then the SysTick interrupt must have higher priority (numerically lower) than the peripheral interrupt. Otherwise the caller ISR process will be blocked. To change the SysTick interrupt priority you have to use HAL_NVIC_SetPriority() function.</p></li>
+<li><p>The application need to ensure that the SysTick time base is always set to 1 millisecond to have correct HAL operation.</p></li>
+</ol>
+<h3 id="keywords"><b>Keywords</b></h3>
+<p>Connectivity, Communication, I3C, Interrupt, Controller, Target, Dynamic Address Assignment, Transmission, Reception, Wakeup, ResetPattern, Stop mode.</p>
+<h3 id="directory-contents"><b>Directory contents</b></h3>
+<ul>
+<li>I3C/I3C_Target_WakeUpFromStop/Inc/stm32u3xx_nucleo_conf.h BSP configuration file</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Inc/stm32u3xx_hal_conf.h HAL configuration file</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Inc/stm32u3xx_it.h I3C interrupt handlers header file</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Inc/main.h Header for main.c module</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Src/stm32u3xx_it.c I3C interrupt handlers</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Src/main.c Main program</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Src/system_stm32u3xx.c STM32U3xx system source file</li>
+<li>I3C/I3C_Target_WakeUpFromStop/Src/stm32u3xx_hal_msp.c HAL MSP file</li>
+</ul>
+<h3 id="hardware-and-software-environment"><b>Hardware and Software environment</b></h3>
+<ul>
+<li><p>This example runs on STM32U385RG devices.</p></li>
+<li><p>This example has been tested with NUCLEO-U385RG board and can be easily tailored to any other supported device and development board.</p></li>
+<li><p>NUCLEO-U385RG Set-up</p>
+<ul>
+<li>Use short wire as possible between the boards or twist an independent ground wire on each I3C lines mean one GND twist around SCL and one GND twist around SDA to help communication at 12.5Mhz.</li>
+<li>Connect I3C_SCL line of Controller board (PB13 (Arduino D15/SCL CN5 pin 4, Morpho CN10 pin30)) to I3C_SCL line of Target Board (PB13 (Arduino D15/SCL CN5 pin 4, Morpho CN10 pin30)).</li>
+<li>Connect I3C_SDA line of Controller board (PB14 (Arduino D14/SDA CN5 pin 5, Morpho CN10 pin28)) to I3C_SDA line of Target Board (PB14 (Arduino D14/SDA CN5 pin 5, Morpho CN10 pin28)).</li>
+<li>Connect GND of Controller board to GND of Target Board.</li>
+</ul></li>
+</ul>
+<h3 id="how-to-use-it"><b>How to use it ?</b></h3>
+<p>In order to make the program work, you must do the following :</p>
+<ul>
+<li>Rebuild all files and load your image into Controller memory (I3C_Controller_ResetPattern_WakeUpFromLowPower)</li>
+<li>Then rebuild all files and load your image into Target memory (I3C_Target_WakeUpFromStop)</li>
+<li>Run the Controller before run the Target, this will let a false startup phase on Target side as there is no high level on the bus, if the Target is started before the Controller.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,9 @@
+[ProjectFiles]
+HeaderPath=..\..\..\..\..\..\Drivers\BSP\STM32U3xx_Nucleo;..\..\..\..\..\..\Drivers\BSP\Components\Common;../BSP/Components/sta350bw;../BSP/STM32U3xx_Nucleo
+[Others]
+Define=
+HALModule=GPIO;I2C
+[Groups]
+Doc=../README.md;
+Drivers/BSP/STM32U3xx_Nucleo=..\..\..\..\..\..\Drivers\BSP\STM32U3xx_Nucleo\stm32u3xx_nucleo.c;..\BSP\STM32U3xx_Nucleo\stm32u3xx_nucleo_bus.c;
+Drivers/BSP/Components/sta350bw=..\BSP\Components\sta350bw\sta350bw.c;..\BSP\Components\sta350bw\sta350bw_reg.c

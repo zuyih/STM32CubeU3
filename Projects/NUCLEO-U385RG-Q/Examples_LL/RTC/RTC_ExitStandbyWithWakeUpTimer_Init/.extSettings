@@ -1,0 +1,8 @@
+[ProjectFiles]
+HeaderPath=
+[Others]
+Define=
+HALModule=
+[Groups]
+Doc=../README.md;
+Drivers/STM32U3xx_HAL_Driver=../../../../../../Drivers/STM32U3xx_HAL_Driver/Src/stm32u3xx_ll_rtc.c;

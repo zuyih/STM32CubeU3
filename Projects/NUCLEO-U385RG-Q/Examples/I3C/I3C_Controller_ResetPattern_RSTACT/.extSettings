@@ -1,0 +1,7 @@
+[ProjectFiles]
+HeaderPath=..\..\..\..\..\..\Drivers\BSP\STM32U3xx_Nucleo
+[Others]
+Define=
+[Groups]
+Doc=../README.md;
+Drivers/BSP/STM32U3xx_Nucleo=../../../../../../Drivers/BSP/STM32U3xx_Nucleo/stm32u3xx_nucleo.c;

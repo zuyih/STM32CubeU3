@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Readme</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../../../../_htmresc/mini-st_2020.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div class="row">
+<div class="col-sm-12 col-lg-8">
+<h2 id="tim_wakeupfromsleep-example-description"><b>TIM_WakeUpFromSleep Example Description</b></h2>
+<p>How to enter the Sleep mode and wake up from this mode by using the timer’s update interrupt.</p>
+<p>In the associated software, the system clock is set to 96 MHz. A timer configured to generate an interrupt every one second. The SysTick is programmed to generate an interrupt each 1 ms and in the SysTick interrupt handler, LD2 is toggled in order to indicate whether the MCU is in SLEEP mode or RUN mode.</p>
+<p>5 seconds after start-up, time base generation in interrupt mode is started and the system automatically enters SLEEP mode. LD2 stops toggling. After one second, the timer’s update interrupt is generated and the system is woken-up. The software then comes back in RUN mode for 5 sec. before automatically re-starting the timer and entering SLEEP mode again.</p>
+<p>LD2 is used to monitor the system state as follows:</p>
+<ul>
+<li>LD2 toggling: system in RUN mode</li>
+<li>LD2 off : system in SLEEP mode</li>
+</ul>
+<h4 id="notes"><b>Notes</b></h4>
+<ol type="1">
+<li><p>These steps are repeated in an infinite loop.</p></li>
+<li><p>To measure the current consumption in SLEEP mode, remove JP4 jumper and connect an amperemeter to JP4 to measure IDD current.</p></li>
+<li><p>This example can not be used in DEBUG mode due to the fact that the Cortex-M33 core is no longer clocked during low power mode so debugging features are disabled.</p></li>
+<li><p>Care must be taken when using HAL_Delay(), this function provides accurate delay (in milliseconds) based on variable incremented in SysTick ISR. This implies that if HAL_Delay() is called from a peripheral ISR process, then the SysTick interrupt must have higher priority (numerically lower) than the peripheral interrupt. Otherwise the caller ISR process will be blocked. To change the SysTick interrupt priority you have to use HAL_NVIC_SetPriority() function.</p></li>
+<li><p>The application needs to ensure that the SysTick time base is always set to 1 millisecond to have correct HAL operation.</p></li>
+</ol>
+<h3 id="keywords"><b>Keywords</b></h3>
+<p>Power, PWR, Timer, Update interrupt, Sleep mode, Interrupt, Wakeup, External reset</p>
+<h3 id="directory-contents"><b>Directory contents</b></h3>
+<ul>
+<li>TIM/TIM_WakeUpFromSleep/Inc/stm32u3xx_nucleo_conf.h BSP configuration file</li>
+<li>TIM/TIM_WakeUpFromSleep/Inc/stm32u3xx_conf.h HAL Configuration file</li>
+<li>TIM/TIM_WakeUpFromSleep/Inc/stm32u3xx_it.h Header for stm32u3xx_it.c</li>
+<li>TIM/TIM_WakeUpFromSleep/Inc/main.h Header file for main.c</li>
+<li>TIM/TIM_WakeUpFromSleep/Src/system_stm32u3xx.c STM32U3xx system clock configuration file</li>
+<li>TIM/TIM_WakeUpFromSleep/Src/stm32u3xx_it.c Interrupt handlers</li>
+<li>TIM/TIM_WakeUpFromSleep/Src/stm32u3xx_hal_msp.c HAL MSP module</li>
+<li>TIM/TIM_WakeUpFromSleep/Src/main.c Main program</li>
+</ul>
+<h3 id="hardware-and-software-environment"><b>Hardware and Software environment</b></h3>
+<ul>
+<li><p>This example runs on STM32U385RGTxQ devices</p></li>
+<li><p>This example has been tested with STMicroelectronics NUCLEO-U385RG-Q board and can be easily tailored to any other supported device and development board.</p></li>
+<li>NUCLEO-U385RG-Q set-up:
+<ul>
+<li>LD2 connected to PA.05 pin</li>
+</ul></li>
+</ul>
+<h3 id="how-to-use-it"><b>How to use it ?</b></h3>
+<p>In order to make the program work, you must do the following :</p>
+<ul>
+<li>Open your preferred toolchain</li>
+<li>Rebuild all files and load your image into target memory</li>
+<li>Run the example</li>
+</ul>
+</div>
+</div>
+</body>
+</html>
