@@ -16,6 +16,10 @@ Different configuration will be observed :
 
 When user press User push-button, a LD2 toggle is done to indicate a change in MCO config.
 
+#### <b>Notes</b>
+
+Make sure to mount an HSE quartz oscillator on the X2 solder bridge of the board
+
 ### <b>Keywords</b>
 
 System, RCC, MSIS, HSI48, SYSCLK, HSE, Clock, Oscillator

@@ -3,13 +3,11 @@
   * @file    system_stm32u3xx_s.c
   * @author  MCD Application Team
   * @brief   CMSIS Cortex-M33 Device Peripheral Access Layer System Source File
-  *          to be used in secure application when the system implements
-  *          the TrustZone-M security.
   *
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -30,13 +28,6 @@
   *      - SystemCoreClockUpdate(): Updates the variable SystemCoreClock and must
   *                                 be called whenever the core clock is changed
   *                                 during program execution.
-  *
-  *      - SECURE_SystemCoreClockUpdate(): Non-secure callable function to update
-  *                                        the variable SystemCoreClock and return
-  *                                        its value to the non-secure calling
-  *                                        application. It must be called whenever
-  *                                        the core clock is changed during program
-  *                                        execution.
   *
   *   After each device reset the MSI (12 MHz) is used as system clock source.
   *   Then SystemInit() function is called, in "startup_stm32u3xx.s" file, to
@@ -75,7 +66,6 @@
   * @{
   */
 #include "stm32u3xx.h"
-#include "partition_stm32u3xx.h"  /* Trustzone-M core secure attributes */
 
 /**
   * @}
@@ -84,12 +74,6 @@
 /** @addtogroup STM32U3xx_System_Private_TypesDefinitions
   * @{
   */
-
-#if defined ( __ICCARM__ )
-#  define CMSE_NS_ENTRY __cmse_nonsecure_entry
-#else
-#  define CMSE_NS_ENTRY __attribute((cmse_nonsecure_entry))
-#endif
 /**
   * @}
   */
@@ -126,7 +110,7 @@
 /* #define VECT_TAB_SRAM */
 #if defined(VECT_TAB_SRAM)
 #define VECT_TAB_BASE_ADDRESS   SRAM1_BASE      /*!< Vector Table base address field.
-                                   This value must be a multiple of 0x200. */
+                                                     This value must be a multiple of 0x200. */
 #define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
                                                      This value must be a multiple of 0x200. */
 #else
@@ -186,12 +170,8 @@ const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
   * @param  None
   * @retval None
   */
-
 void SystemInit(void)
 {
-  /* SAU/IDAU, FPU and Interrupts secure/non-secure allocation settings */
-  TZ_SAU_Setup();
-
   /* FPU settings ------------------------------------------------------------*/
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
   SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));  /* set CP10 and CP11 Full Access */
@@ -255,18 +235,18 @@ void SystemCoreClockUpdate(void)
     tmp = RCC->ICSCR1;
     /* Check which MSIS Range is selected */
     if ((tmp & RCC_ICSCR1_MSIRGSEL) != 0x00u)
-  {
+    {
       /* Check which MSIRCx is selected as MSIS source */
       if ((tmp & RCC_ICSCR1_MSISSEL) != 0x00u)
       {
         /* MSI RC1 is selected */
         SystemCoreClock = MSIRC1_VALUE;
-  }
-  else
-  {
+      }
+      else
+      {
         /* MSI RC0 is selected */
         SystemCoreClock = MSIRC0_VALUE;
-  }
+      }
 
       /* Get MSIS range */
       msirange = (tmp & RCC_ICSCR1_MSISDIV) >> RCC_ICSCR1_MSISDIV_Pos;
@@ -293,7 +273,7 @@ void SystemCoreClockUpdate(void)
     break;
 
   default:
-    SystemCoreClock = 0xFFFFFFFFu;
+    SystemCoreClock = 0xFFFFFFFFU;
     break;
   }
 
@@ -302,21 +282,6 @@ void SystemCoreClockUpdate(void)
   tmp = AHBPrescTable[((RCC->CFGR2 & RCC_CFGR2_HPRE) >> RCC_CFGR2_HPRE_Pos)];
   /* HCLK clock frequency */
   SystemCoreClock >>= tmp;
-}
-
-/**
-  * @brief  Secure Non-Secure-Callable function to return the current
-  *         SystemCoreClock value after SystemCoreClock update.
-  *         The SystemCoreClock variable contains the core clock (HCLK), it can
-  *         be used by the user application to setup the SysTick timer or configure
-  *         other parameters.
-  * @retval SystemCoreClock value (HCLK)
-  */
-CMSE_NS_ENTRY uint32_t SECURE_SystemCoreClockUpdate(void)
-{
-  SystemCoreClockUpdate();
-
-  return SystemCoreClock;
 }
 
 /**

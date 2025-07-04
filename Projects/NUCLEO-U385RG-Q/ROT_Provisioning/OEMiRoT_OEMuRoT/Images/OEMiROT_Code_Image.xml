@@ -39,10 +39,10 @@
 	</Param>
 	<Param>
 		<Name>Firmware area size</Name>
-		<Value>0x10000</Value>
+		<Value>0x14000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
-		<Default>0x10000</Default>
+		<Default>0x14000</Default>
 	</Param>
 	<Param>
 		<Name>Header Size</Name>

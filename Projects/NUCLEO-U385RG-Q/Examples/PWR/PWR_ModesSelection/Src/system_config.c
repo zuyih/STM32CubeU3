@@ -304,8 +304,12 @@ System_StatusTypeDef system_ram_retention_config(System_LowPowerModeScenarioType
   }
 
   /* Disable every retention by default before re-enabling mandatory ones */
+  if ((scenario > SYSTEM_LOWPOWER_S3) && (scenario != SYSTEM_LOWPOWER_S5) && (scenario != SYSTEM_LOWPOWER_S7))
+  {
   __HAL_RCC_SRAM1_CLK_DISABLE();
   HAL_PWREx_EnableRAMsPowerDown(PWR_SRAM1_POWERDOWN);
+  }
+
   HAL_PWREx_DisableSRAM2ContentStandbyRetention(PWR_SRAM2_FULL_STANDBY_RETENTION);
   HAL_PWREx_DisableRAMsContentStopRetention(PWR_SRAM1_FULL_STOP_RETENTION);
   HAL_PWREx_DisableRAMsContentStopRetention(PWR_SRAM2_FULL_STOP_RETENTION);
@@ -379,7 +383,6 @@ System_StatusTypeDef system_ram_retention_config(System_LowPowerModeScenarioType
     /* full SRAM (SRAM 1 + 2 = 256kb) */
     default:
     {
-      HAL_PWREx_DisableRAMsPowerDown(PWR_SRAM1_POWERDOWN);
       HAL_PWREx_EnableRAMsContentStopRetention(PWR_SRAM1_FULL_STOP_RETENTION);
       HAL_PWREx_EnableRAMsContentStopRetention(PWR_SRAM2_FULL_STOP_RETENTION);
       break;

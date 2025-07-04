@@ -1,6 +1,43 @@
 #!/bin/bash
+#=================================================================================================
+# Managing HOST OS diversity : begin 
+#=================================================================================================
+OS=$(uname)
+
+echo ${OS} | grep -i -e windows -e mingw >/dev/null
+if [ $? == 0 ]; then
+  echo "=================================="
+  echo "HOST OS : Windows detected"
+  echo ""
+  echo ">>> Running ../postbuild.bat $@"
+  echo ""
+  # Enable : exit immediately if any commands returns a non-zero status
+  set -e
+  cd ../
+  cmd.exe /C postbuild.bat $@
+  # Return OK if no error detected during .bat script
+  exit 0
+fi
+
+if [ "$OS" == "Linux" ]; then
+  echo "HOST OS : Linux detected"
+elif [ "$OS" == "Darwin" ]; then
+  echo "HOST OS : MacOS detected"
+else
+  echo "!!!HOST OS not supported : >$OS<!!!"
+  exit 1
+fi
+
+#=================================================================================================
+# Managing HOST OS diversity : end 
+#=================================================================================================
+echo "=================================="
+echo ">>> Running $0 $@"
+echo ""
+
 # arg1 is the config type (Debug, Release)
 config=$1
+
 # Getting the Trusted Package Creator CLI path
 SCRIPT=$(readlink -f $0)
 project_dir=`dirname $SCRIPT`
@@ -445,6 +482,32 @@ if [ $ret != 0 ]; then error; fi
 $python$applicfg definevalue --layout $preprocess_bl2_file -m RE_FLASH_B_SIZE -n FLASH_B_SIZE $appli_flash_layout --vb >> $current_log_file 2>&1
 ret=$?
 if [ $ret != 0 ]; then error; fi
+
+$python$applicfg definevalue --layout $preprocess_bl2_file -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_0_OFFSET -n OEMIROT_AREA_0_OFFSET $appli_flash_layout --vb >> $current_log_file 2>&1
+ret=$?
+if [ $ret != 0 ]; then error; fi
+
+$python$applicfg definevalue --layout $preprocess_bl2_file -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_0_SIZE -n OEMIROT_AREA_0_SIZE $appli_flash_layout --vb >> $current_log_file 2>&1
+ret=$?
+if [ $ret != 0 ]; then error; fi
+
+$python$applicfg definevalue --layout $preprocess_bl2_file -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_2_OFFSET -n OEMIROT_AREA_2_OFFSET $appli_flash_layout --vb >> $current_log_file 2>&1
+ret=$?
+if [ $ret != 0 ]; then error; fi
+
+$python$applicfg definevalue --layout $preprocess_bl2_file -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_2_SIZE -n OEMIROT_AREA_2_SIZE $appli_flash_layout --vb >> $current_log_file 2>&1
+ret=$?
+if [ $ret != 0 ]; then error; fi
+
+if [ "$oemurot_enabled" == "1" ]; then
+  $python$applicfg setdefine -a uncomment -n OEMUROT_ENABLE -v 1 $appli_flash_layout
+  ret=$?
+  if [ $ret != 0 ]; then error; fi
+else
+  $python$applicfg setdefine -a comment -n OEMUROT_ENABLE -v 1 $appli_flash_layout
+  ret=$?
+  if [ $ret != 0 ]; then error; fi
+fi
 
 # ============================================================ end ============================================================
 exit 0

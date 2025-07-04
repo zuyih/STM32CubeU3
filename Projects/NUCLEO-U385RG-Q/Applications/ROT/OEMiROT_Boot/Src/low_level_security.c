@@ -69,7 +69,7 @@ const struct mpu_armv8m_region_cfg_t region_cfg_init_s[] =
     FLASH_BASE_S + FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 1,
     MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
     MPU_ARMV8M_XN_EXEC_OK,
-    MPU_ARMV8M_AP_RW_PRIV_ONLY,
+    MPU_ARMV8M_AP_RO_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
 #ifdef FLOW_CONTROL
     FLOW_STEP_MPU_S_I_EN_R0,
@@ -78,7 +78,7 @@ const struct mpu_armv8m_region_cfg_t region_cfg_init_s[] =
     FLOW_CTRL_MPU_S_I_CH_R0,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 1: Allows RW access for HASH REF - NVCNT - SCRATCH area's */
+  /* Region 1: Allows RW access for HASH REF - NVCNT */
   {
     1,
     FLASH_BASE_S,
@@ -94,11 +94,17 @@ const struct mpu_armv8m_region_cfg_t region_cfg_init_s[] =
     FLOW_CTRL_MPU_S_I_CH_R1,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 2 : Allows RW access to all secure PRIMARY SLOTS areas */
+  /* Region 2 : Allows RW access to SCRATCH area and all secure PRIMARY SLOTS areas */
   {
     2,
-    FLASH_BASE_S + FLASH_AREA_BEGIN_OFFSET,
-    FLASH_BASE_S + FLASH_AREA_BEGIN_OFFSET + FLASH_S_DATA_PARTITION_SIZE + FLASH_S_PARTITION_SIZE - 1,
+    FLASH_BASE_S + FLASH_AREA_SCRATCH_OFFSET,
+#if defined (OEMIROT_FIRST_BOOT_STAGE)
+    FLASH_BASE_S + FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE + OEMUROT_HASH_REF_SIZE + OEMUROT_BL2_NVCNT_SIZE + \
+    OEMUROT_PERSO_SIZE + FLASH_S_PARTITION_SIZE - 1,
+#else
+    FLASH_BASE_S + FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE + FLASH_S_DATA_PARTITION_SIZE + \
+    FLASH_AREAS_TFM_SIZE + FLASH_S_PARTITION_SIZE - 1,
+#endif /*OEMIROT_FIRST_BOOT_STAGE */
     MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
@@ -130,7 +136,7 @@ const struct mpu_armv8m_region_cfg_t region_cfg_init_s[] =
   {
     4,
     BL2_DATA_START,
-    BL2_DATA_START + BL2_DATA_SIZE - 1,
+    BL2_DATA_START + BOOT_SHARED_DATA_SIZE + BL2_DATA_SIZE - 1,
     MPU_ARMV8M_MAIR_ATTR_DATA_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
@@ -388,6 +394,16 @@ void LL_SECU_CheckStaticProtections(void)
 {
   static FLASH_OBProgramInitTypeDef flash_option_bytes_bank1 = {0};
   static FLASH_OBProgramInitTypeDef flash_option_bytes_bank2 = {0};
+#ifdef OEMIROT_NSBOOT_CHECK_ENABLE
+  static FLASH_OBProgramInitTypeDef flash_option_bytes_nsboot0 = {0};
+  static FLASH_OBProgramInitTypeDef flash_option_bytes_nsboot1 = {0};
+
+    /* Get NSBOOTADD0 and NSBOOTADD1 value */
+  flash_option_bytes_nsboot0.BootAddrConfig = OB_BOOTADDR_NS0;
+  HAL_FLASHEx_OBGetConfig(&flash_option_bytes_nsboot0);
+  flash_option_bytes_nsboot1.BootAddrConfig = OB_BOOTADDR_NS1;
+  HAL_FLASHEx_OBGetConfig(&flash_option_bytes_nsboot1);
+#endif /* OEMIROT_NSBOOT_CHECK_ENABLE */
 
   /* Get bank1 areaA OB  */
   flash_option_bytes_bank1.WRPArea = OB_WRPAREA_BANK1_AREAA;
@@ -430,6 +446,16 @@ void LL_SECU_CheckStaticProtections(void)
     Error_Handler();
   }
 #endif /* OEMUROT_ENABLE */
+
+#ifdef OEMIROT_NSBOOT_CHECK_ENABLE
+  /* Check non-secure boot addresses */
+  if ((flash_option_bytes_nsboot0.BootAddr != BL2_BOOT_VTOR_ADDR)
+      || (flash_option_bytes_nsboot1.BootAddr != BL2_BOOT_VTOR_ADDR))
+  {
+    BOOT_LOG_ERR("Unexpected value for NS BOOT Address");
+    Error_Handler();
+  }
+#endif /* OEMIROT_NSBOOT_CHECK_ENABLE */
 
 #if defined(OEMIROT_FIRST_BOOT_STAGE)
   /* Check bank1 secure flash protection */
@@ -634,7 +660,6 @@ static void rdp_level(uint32_t rdplevel, uint32_t current_rdplevel)
 {
   BOOT_LOG_INF("RDPLevel 0x%x (0x%x)", current_rdplevel, rdplevel);
   BOOT_LOG_ERR("Unexpected value for RDP level");
-  Error_Handler();
 }
 #endif /* OEMIROT_OB_RDP_LEVEL_VALUE */
 

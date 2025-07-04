@@ -160,18 +160,27 @@ int main(void)
   */
 void SystemClock_Config(void)
 {
-  LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
-  while(LL_FLASH_GetLatency()!= LL_FLASH_LATENCY_2)
+  /** Enable Epod Booster
+  */
+  LL_AHB1_GRP2_EnableClock(LL_AHB1_GRP2_PERIPH_PWR);
+  LL_RCC_SetEPODBoosterClkSource(LL_RCC_EPODBOOSTCLKSRCE_MSIS);
+  LL_RCC_SetEPODBoosterClkPrescaler(LL_RCC_EPODBOOSTCLKPRESCAL_1);
+  LL_PWR_EnableEPODBooster();
+  while(LL_PWR_IsActiveFlag_BOOST() != 1U)
   {
   }
 
+  /** Configure the main internal regulator output voltage
+  */
   LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
+  while(LL_PWR_GetRegulCurrentVOS() != LL_PWR_REGU_VOLTAGE_SCALE1)
+  {
+  }
 
-  /* Enable Epod Booster */
-  LL_AHB1_GRP2_EnableClock(LL_AHB1_GRP2_PERIPH_PWR);
-  LL_RCC_SetEPODBoosterClkSource(LL_RCC_EPODBOOSTCLKSRCE_MSIS);
-  LL_PWR_EnableEPODBooster();
-  while(LL_PWR_IsActiveFlag_BOOST() != 1)
+  /** Set Flash latency before switching to MSIS
+  */
+  LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
+  while(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2)
   {
   }
 

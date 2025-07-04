@@ -1,5 +1,8 @@
 #!/bin/bash
 if [ $# -ge 1 ]; then script_mode=$1; else script_mode=MANUAL; fi
+param2=$2
+rdp_lev=$param2
+
 source ../env.sh
 # Get config updated by OEMiROT_Boot
 source img_config.sh
@@ -13,7 +16,7 @@ error()
   return 1
 }
 
-bootpath=OEMiRoT
+bootpath=OEMiROT
 
 # Data updated with the postbuild of OEMiROT-Boot
 sec1_start=0x0
@@ -68,13 +71,17 @@ remove_bank2_protect="-ob SECWM2_PSTRT=$flashsectnbr SECWM2_PEND=0 WRP2A_PSTRT=$
 erase_all="-e all"
 remove_hdp_protection="-ob HDP1_PEND=0 HDP1EN=0xB4 HDP2_PEND=0 HDP2EN=0xB4"
 remove_boot_lock="-ob BOOT_LOCK=0"
+wrp_protect=
+if [ "$rdp_lev" -ge 1 ]; then
+	wrp_protect="UNLOCK_1A=0 UNLOCK_1B=0 UNLOCK_2A=0 UNLOCK_2B=0"
+fi
 
 # =============================================================== Hardening ===============================================================
 hide_protect_1="HDP1_PEND=$hdp1_end HDP1EN=0x1"
 hide_protect_2="HDP2_PEND=$hdp2_end HDP2EN=0x1"
 boot_write_protect="WRP1A_PSTRT=$wrp1a_start WRP1A_PEND=$wrp1a_end"
 sec_water_mark=SECWM1_PSTRT="$sec1_start SECWM1_PEND=$sec1_end SECWM2_PSTRT=$sec2_start SECWM2_PEND=$sec2_end"
-boot_address="-ob SECBOOTADD0=$secbootadd0"
+boot_address="-ob SECBOOTADD0=$secbootadd0 NSBOOTADD0=$secbootadd0 NSBOOTADD1=$secbootadd0"
 boot_lock="BOOT_LOCK=1"
 
 # =============================================== Configure Option Bytes ==================================================================
@@ -179,7 +186,7 @@ echo "OEMiROT_Boot Written"
 action="Configure Option Bytes"
 echo "$action"
 echo "Configure Secure option Bytes: Write Protection, Hide Protection and boot lock"
-"$stm32programmercli" $connect_no_reset -ob $sec_water_mark $boot_write_protect $hide_protect_1 $boot_lock
+"$stm32programmercli" $connect_no_reset -ob $sec_water_mark $boot_write_protect $hide_protect_1 $boot_lock $wrp_protect
 if [ $? -ne 0 ]; then error; return 1; fi
 
 echo "Programming success"

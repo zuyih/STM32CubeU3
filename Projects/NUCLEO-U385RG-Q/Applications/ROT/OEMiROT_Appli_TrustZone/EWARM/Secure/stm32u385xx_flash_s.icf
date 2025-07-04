@@ -8,7 +8,7 @@
 
 define symbol ROM_S_START                  = S_CODE_START;
 define symbol ROM_S_SIZE                   = S_CODE_SIZE;
-define symbol ROM_S_END                    = (S_CODE_START - S_CODE_SIZE - 1);
+define symbol ROM_S_END                    = (S_CODE_START + S_CODE_SIZE - 1);
 
 define symbol ROM_NSC_START                = NSC_CODE_START;
 define symbol ROM_NSC_END                  = (NSC_CODE_START + NSC_CODE_SIZE - 1);

@@ -53,6 +53,7 @@
 #include "appli_flash_layout.h"
 
 #define BL2_HEADER_SIZE                     (0x400) /*!< Appli image header size */
+#define BL2_DATA_HEADER_SIZE                (0x20)  /*!< Data image header size */
 #define BL2_TRAILER_SIZE                    (0x2000)
 
 #define S_ROM_ALIAS_BASE                    (FLASH_BASE_S)

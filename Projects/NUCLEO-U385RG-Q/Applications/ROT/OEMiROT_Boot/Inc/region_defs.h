@@ -56,8 +56,8 @@
 #endif
 
 /*  This area in SRAM 2 is updated BL2 and can be lock to avoid any changes */
-#define BOOT_SHARED_DATA_SIZE                   0
-#define BOOT_SHARED_DATA_BASE                   (S_RAM_ALIAS(_SRAM1_SIZE_MAX))
+#define BOOT_SHARED_DATA_SIZE                   0x400
+#define BOOT_SHARED_DATA_BASE                   (_SRAM2_BASE_S + _SRAM2_SIZE_MAX - BOOT_SHARED_DATA_SIZE)
 
 /* IMAGE_CODE_SIZE is the space available for the software binary image.
  * It is less than the FLASH_PARTITION_SIZE because we reserve space
@@ -97,6 +97,9 @@
 
 #define S_IMAGE_PRIMARY_AREA_OFFSET             (S_IMAGE_PRIMARY_PARTITION_OFFSET + BL2_HEADER_SIZE)
 
+/* Definition for mcuboot for fast wake-up from low power feature */
+#define S_CODE_START                            (S_ROM_ALIAS(S_IMAGE_PRIMARY_AREA_OFFSET))
+
 /* Personalized region */
 #define PERSO_START                             (S_ROM_ALIAS(FLASH_AREA_PERSO_OFFSET))
 #define PERSO_SIZE                              (FLASH_AREA_PERSO_SIZE)
@@ -124,7 +127,7 @@
 /*  regression from local tool with non secure attachment
  *  This avoid blocking board in case of hardening error */
 #define BL2_DATA_START                          (_SRAM2_BASE_S)
-#define BL2_DATA_SIZE                           (_SRAM2_SIZE_MAX)
+#define BL2_DATA_SIZE                           (_SRAM2_SIZE_MAX - BOOT_SHARED_DATA_SIZE)
 #define BL2_DATA_LIMIT                          (BL2_DATA_START + BL2_DATA_SIZE - 1)
 
 /* Define BL2 MPU SRAM protection to remove execution capability */

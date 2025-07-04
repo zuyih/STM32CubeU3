@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Release_Notes</title>
+  <title>Release Notes for STM32 Middleware Mbed TLS Key Wrap
+Engine</title>
   <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -110,6 +111,16 @@ middleware to interface with the PSA Crypto API as an opaque driver.</p>
 <td style="text-align: center;">NO</td>
 </tr>
 <tr class="even">
+<td>AES CCM</td>
+<td style="text-align: center;">YES</td>
+<td style="text-align: center;">NO</td>
+<td style="text-align: center;">YES</td>
+<td style="text-align: center;">YES</td>
+<td style="text-align: center;">NO</td>
+<td style="text-align: center;">NO</td>
+<td style="text-align: center;">NO</td>
+</tr>
+<tr class="odd">
 <td>ECDH</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: center;">YES</td>
@@ -119,7 +130,7 @@ middleware to interface with the PSA Crypto API as an opaque driver.</p>
 <td style="text-align: center;">NO</td>
 <td style="text-align: center;">NO</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>ECDSA</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: center;">YES</td>
@@ -129,7 +140,7 @@ middleware to interface with the PSA Crypto API as an opaque driver.</p>
 <td style="text-align: center;">YES</td>
 <td style="text-align: center;">YES</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>RSA PKCS(v1.5)</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: center;">NO</td>
@@ -139,7 +150,7 @@ middleware to interface with the PSA Crypto API as an opaque driver.</p>
 <td style="text-align: center;">YES</td>
 <td style="text-align: center;">NO</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>RSA PKCS(v2.2)</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: center;">NO</td>
@@ -216,16 +227,15 @@ Authentication Key.</p>
 <p><br />
 </p>
 <div class="collapse">
-<input type="checkbox" id="collapse-section2" checked aria-hidden="true">
-<label for="collapse-section2" aria-hidden="true"><strong>V1.0.1 /
-23-January-2025</strong></label>
+<input type="checkbox" id="collapse-section3" checked aria-hidden="true">
+<label for="collapse-section3" aria-hidden="true"><strong>V1.0.2 /
+20-May-2025</strong></label>
 <div>
 <h2 id="main-changes">Main changes</h2>
 <ul>
 <li>Maintenance release
 <ul>
-<li>Fix CCM implementation to support variable tag length</li>
-<li>Enhance code style and remove unused parameters</li>
+<li>Free ecp context after each use in KWE PSA driver interface</li>
 </ul></li>
 </ul>
 <h2 id="known-limitations">Known limitations</h2>
@@ -240,20 +250,24 @@ Authentication Key.</p>
 <ul>
 <li>This component depends on:
 <ul>
-<li>Mbed TLS cryptography library v3.6.2</li>
-<li>STM32 Mbed TLS Alt v1.1.0</li>
+<li>Mbed TLS cryptography library version v3.6.2 or higher</li>
+<li>STM32 Mbed TLS Alt version v1.1.0 or higher</li>
 </ul></li>
 </ul>
 </div>
 </div>
 <div class="collapse">
-<input type="checkbox" id="collapse-section1" checked aria-hidden="true">
-<label for="collapse-section1" aria-hidden="true"><strong>V1.0.0 /
-29-October-2024</strong></label>
+<input type="checkbox" id="collapse-section2" aria-hidden="true">
+<label for="collapse-section2" aria-hidden="true"><strong>V1.0.1 /
+23-January-2025</strong></label>
 <div>
 <h2 id="main-changes-1">Main changes</h2>
 <ul>
-<li>First release</li>
+<li>Maintenance release
+<ul>
+<li>Fix CCM implementation to support variable tag length</li>
+<li>Enhance code style and remove unused parameters</li>
+</ul></li>
 </ul>
 <h2 id="known-limitations-1">Known limitations</h2>
 <ul>
@@ -264,6 +278,33 @@ Authentication Key.</p>
 <li>None.</li>
 </ul>
 <h2 id="dependencies-1">Dependencies</h2>
+<ul>
+<li>This component depends on:
+<ul>
+<li>Mbed TLS cryptography library v3.6.2</li>
+<li>STM32 Mbed TLS Alt v1.1.0</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section1" aria-hidden="true">
+<label for="collapse-section1" aria-hidden="true"><strong>V1.0.0 /
+29-October-2024</strong></label>
+<div>
+<h2 id="main-changes-2">Main changes</h2>
+<ul>
+<li>First release</li>
+</ul>
+<h2 id="known-limitations-2">Known limitations</h2>
+<ul>
+<li>None</li>
+</ul>
+<h2 id="backward-compatibility-2">Backward compatibility</h2>
+<ul>
+<li>None.</li>
+</ul>
+<h2 id="dependencies-2">Dependencies</h2>
 <ul>
 <li>This component depends on:
 <ul>

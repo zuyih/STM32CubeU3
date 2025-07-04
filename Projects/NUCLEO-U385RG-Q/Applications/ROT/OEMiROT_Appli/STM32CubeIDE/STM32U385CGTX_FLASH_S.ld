@@ -38,9 +38,6 @@
 ROM_S_START       = S_CODE_START;
 ROM_S_SIZE        = S_CODE_SIZE;
 
-ROM_NSC_START     = NSC_CODE_START;
-ROM_NSC_SIZE      = NSC_CODE_SIZE;
-
 RAM_S_START       = S_RAM_START;
 RAM_S_SIZE        = S_RAM_SIZE;
 
@@ -59,7 +56,6 @@ MEMORY
 {
   RAM    (xrw)   : ORIGIN = RAM_S_START,   LENGTH = RAM_S_SIZE
   FLASH  (rx)    : ORIGIN = ROM_S_START,   LENGTH = ROM_S_SIZE
-  FLASH_NSC (rx) : ORIGIN = ROM_NSC_START, LENGTH = ROM_NSC_SIZE
 }
 
 /* Sections */
@@ -161,13 +157,6 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
 
   } >RAM AT> FLASH
-
-  .gnu.sgstubs :
-  {
-    . = ALIGN(4);
-    *(.gnu.sgstubs*)   /* Secure Gateway stubs */
-    . = ALIGN(4);
-  } >FLASH_NSC
 
   /* Uninitialized data section into "RAM" Ram type memory */
   . = ALIGN(4);

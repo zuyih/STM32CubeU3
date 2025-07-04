@@ -53,14 +53,18 @@ __asm("  .global __ARM_use_no_argv\n");
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-
-
+/* Enable print of boot time (obtained through DWT).
+   DWT usage requires product state is not closed/locked.
+   OEMxRoT logs must be disabled for relevant boot time. */
+/* #define PRINT_BOOT_TIME */
 
 #define USER_APP_NBLINKS  ((uint8_t) 1U)
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t *pUserAppId;
 const uint8_t UserAppId = 'A';
+uint64_t time;
+uint32_t end;
 
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
@@ -137,6 +141,9 @@ size_t __write(int file, unsigned char const *ptr, size_t len)
 int main(int argc, char **argv)
 /*int main(void) */
 {
+  /* Get boot cycles */
+  end = DWT->CYCCNT;
+
   /*  set example to const : this const changes in binary without rebuild */
   pUserAppId = (uint8_t *)&UserAppId;
 
@@ -151,6 +158,9 @@ int main(int argc, char **argv)
   */
   HAL_Init();
 
+  /* Get Boot Time */
+  time = ((uint64_t)(end) * 1000U  / SystemCoreClock);
+
   /* DeInitialize RCC to allow PLL reconfiguration when configuring system clock */
   HAL_RCC_DeInit();
 
@@ -159,6 +169,12 @@ int main(int argc, char **argv)
 
   /* Configure Communication module */
   COM_Init();
+
+#ifdef PRINT_BOOT_TIME
+  printf("\r\nBoot time : %u ms at %u MHz", (unsigned int)(time), (unsigned int)(SystemCoreClock/1000000U));
+  printf("\r\n");
+#endif
+
   /* register the Secure Fault Call Back */
   /* Register SecureFault callback defined in non-secure and to be called by secure handler */
   SECURE_RegisterCallback(SECURE_FAULT_CB_ID, (void *)SecureFault_Callback);
@@ -263,10 +279,10 @@ void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
 #if   !defined(MCUBOOT_PRIMARY_ONLY)
-  printf("  New Fw Image ------------------------------------------ 3\r\n\n");
+  printf("  New Fw Image ------------------------------------------ 1\r\n\n");
 #endif
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
-  printf("  Non-Secure Data --------------------------------------- 4\r\n\n");
+  printf("  Non-Secure Data --------------------------------------- 2\r\n\n");
 #endif /* defined(MCUBOOT_NS_DATA_IMAGE_NUMBER) */
   printf("  Selection :\r\n\n");
 }
@@ -294,12 +310,12 @@ void FW_APP_Run(void)
       switch (key)
       {
 #if   !defined(MCUBOOT_PRIMARY_ONLY)
-        case '3' :
+        case '1' :
           FW_UPDATE_Run();
           break;
 #endif
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
-        case '4' :
+        case '2' :
           NS_DATA_Run();
           break;
 #endif /* defined(MCUBOOT_NS_DATA_IMAGE_NUMBER) */

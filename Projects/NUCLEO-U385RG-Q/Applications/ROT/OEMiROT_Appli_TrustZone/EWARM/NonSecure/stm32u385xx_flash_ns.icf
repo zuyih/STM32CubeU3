@@ -7,7 +7,7 @@
 /*************************************************************************************************/
 define symbol ROM_NS_START                 = NS_CODE_START;
 define symbol ROM_NS_SIZE                  = NS_CODE_SIZE;
-define symbol ROM_NS_END                   = (NS_CODE_START - NS_CODE_SIZE - 1);
+define symbol ROM_NS_END                   = (NS_CODE_START + NS_CODE_SIZE - 1);
 
 define symbol RAM_NS_START                 = NS_RAM_START;
 define symbol RAM_NS_SIZE                  = NS_RAM_SIZE;

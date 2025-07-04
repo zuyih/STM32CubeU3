@@ -65,6 +65,7 @@ extern "C" {
 #define FLOW_STEP_MPU_S_I_EN_R5     0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_S_I_EN_R6     0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_S_I_EN_R7     0x00000000U        /*!< No effect on control flow */
+#define FLOW_STEP_MPU_S_I_EN_R8     0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_S_I_EN        0x00000000U        /*!< No effect on control flow */
 #endif /* OEMIROT_BOOT_MPU_PROTECTION */
 
@@ -118,6 +119,7 @@ extern "C" {
 #define FLOW_STEP_MPU_S_I_CH_R5     0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_S_I_CH_R6     0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_S_I_CH_R7     0x00000000U        /*!< No effect on control flow */
+#define FLOW_STEP_MPU_S_I_CH_R8     0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_S_I_CH        0x00000000U        /*!< No effect on control flow */
 #endif /* OEMIROT_BOOT_MPU_PROTECTION */
 

@@ -66,6 +66,14 @@
 /* Total number of images */
 #define MCUBOOT_IMAGE_NUMBER (MCUBOOT_APP_IMAGE_NUMBER + MCUBOOT_S_DATA_IMAGE_NUMBER + MCUBOOT_NS_DATA_IMAGE_NUMBER)
 
+/* IMAGE_CODE_SIZE is the space available for the software binary image.
+ * It is less than the FLASH_PARTITION_SIZE because we reserve space
+ * for the image header and trailer introduced by the bootloader.
+ */
+#define BL2_HEADER_SIZE                         (0x400) /*!< Appli image header size */
+#define BL2_DATA_HEADER_SIZE                    (0x20)  /*!< Data image header size */
+#define BL2_TRAILER_SIZE                        (0x2000)
+
 /* Use image hash reference to reduce boot time (signature check bypass) */
 #define MCUBOOT_USE_HASH_REF
 
@@ -123,11 +131,19 @@
  * Those values are defined for OEMIROT_FIRST_BOOT_STAGE, but 
  * we also need some of them for OEMuROT provisioning.
  */
-#define OEMIROT_AREA_1_SIZE             (0x0C4000)
+#define OEMIROT_AREA_0_SIZE             (0x14000)       /* 80K */
+#define OEMIROT_AREA_1_SIZE             (0xBC000)       /* 752K */
+#define OEMIROT_AREA_2_SIZE             (0x14000)       /* 80K */
+#define OEMIROT_AREA_2_OFFSET           (0xEC000)       /* slot 2 address when flash size: 1 MBytes */
+
 #define OEMIROT_AREA_BEGIN_OFFSET       (0x16000)
-#define OEMIROT_AREA_BL2_OFFSET         (0x0C006000)
+#define OEMIROT_AREA_BL2_OFFSET         (0x6000)
 #define OEMIROT_BL2_WRP_START           (0x4000)
 
+/* control area */
+#if (OEMIROT_AREA_0_SIZE % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "OEMIROT_AREA_0_SIZE not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* OEMIROT_AREA_0_SIZE % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
 #endif  /* OEMIROT_FIRST_BOOT_STAGE || OEMUROT_ENABLE */
 /* Hardcoded value necessary for OEMiROT_OEMuROT : end */
 
@@ -151,10 +167,45 @@
 #define FLASH_BL2_NVCNT_AREA_OFFSET     (FLASH_HASH_REF_AREA_OFFSET + FLASH_HASH_REF_AREA_SIZE)
 #define FLASH_BL2_NVCNT_AREA_SIZE       (FLASH_AREA_IMAGE_SECTOR_SIZE + FLASH_AREA_IMAGE_SECTOR_SIZE)
 
+/* personal area */
+#define FLASH_AREA_PERSO_OFFSET         (FLASH_BL2_NVCNT_AREA_OFFSET + FLASH_BL2_NVCNT_AREA_SIZE)
+#define FLASH_AREA_PERSO_SIZE           (0x2000)
+/* control personal area */
+#if (FLASH_AREA_PERSO_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_PERSO_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* FLASH_AREA_PERSO_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+
+/* area for BL2 code protected by hdp */
+#define FLASH_AREA_BL2_OFFSET           (FLASH_AREA_PERSO_OFFSET+FLASH_AREA_PERSO_SIZE)
+
+#if defined(OEMUROT_ENABLE)
+#define FLASH_AREA_BL2_SIZE             (0x11C00)
+
+/* Control area */
+#if ((FLASH_AREA_BL2_SIZE + BL2_HEADER_SIZE + BL2_TRAILER_SIZE) % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_BL2_SIZE not compatible with OEMIROT_AREA_0_SIZE"
+#endif /* (FLASH_AREA_BL2_SIZE  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+#else /*OEMUROT_ENABLE */
+
+#if !defined(MCUBOOT_PRIMARY_ONLY) && !defined(MCUBOOT_OVERWRITE_ONLY)
+#define FLASH_AREA_BL2_SIZE             (0x12000)
+#else
+#define FLASH_AREA_BL2_SIZE             (0x10000)
+#endif
+/* Control area */
+#if (FLASH_AREA_BL2_SIZE  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_BL2_SIZE  not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* (FLASH_AREA_BL2_SIZE  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+#endif /*OEMUROT_ENABLE */
+
 /* scratch area */
 #if defined(FLASH_AREA_SCRATCH_ID)
 #define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
-#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_BL2_NVCNT_AREA_OFFSET + FLASH_BL2_NVCNT_AREA_SIZE)
+#if defined(OEMUROT_ENABLE)
+#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE + BL2_HEADER_SIZE + BL2_TRAILER_SIZE)
+#else /*OEMUROT_ENABLE */
+#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE)
+#endif /*OEMUROT_ENABLE */
 #if defined(MCUBOOT_OVERWRITE_ONLY)
 #define FLASH_AREA_SCRATCH_SIZE         (0x0000) /* Not used in MCUBOOT_OVERWRITE_ONLY mode */
 #else
@@ -168,25 +219,37 @@
 #define FLASH_AREA_SCRATCH_SIZE         (0x0)
 #endif /* FLASH_AREA_SCRATCH_ID */
 
-/* personal area */
-#define FLASH_AREA_PERSO_OFFSET         (FLASH_BL2_NVCNT_AREA_OFFSET + FLASH_BL2_NVCNT_AREA_SIZE + \
-                                         FLASH_AREA_SCRATCH_SIZE)
-#define FLASH_AREA_PERSO_SIZE           (0x2000)
-/* control personal area */
-#if (FLASH_AREA_PERSO_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
-#error "FLASH_AREA_PERSO_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
-#endif /* FLASH_AREA_PERSO_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
-
-/* area for BL2 code protected by hdp */
-#define FLASH_AREA_BL2_OFFSET           (FLASH_AREA_PERSO_OFFSET+FLASH_AREA_PERSO_SIZE)
-#if !defined(MCUBOOT_PRIMARY_ONLY) && !defined(MCUBOOT_OVERWRITE_ONLY)
-#define FLASH_AREA_BL2_SIZE             (0x12000)
-#else
-#define FLASH_AREA_BL2_SIZE             (0x10000)
-#endif
-
 /* HDP area end at this address */
-#define FLASH_BL2_HDP_END_OFFSET        (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE)
+#define FLASH_BL2_HDP_END_OFFSET        (FLASH_AREA_SCRATCH_OFFSET+FLASH_AREA_SCRATCH_SIZE)
+
+#if defined(TFM_COMPATIBILTY)
+/* OTP / Non-Volatile Counters definitions */
+#define FLASH_OTP_NV_COUNTERS_SECTOR_SIZE (FLASH_AREA_IMAGE_SECTOR_SIZE)
+#define FLASH_OTP_NV_COUNTERS_AREA_OFFSET (FLASH_BL2_HDP_END_OFFSET)
+#define FLASH_OTP_NV_COUNTERS_AREA_SIZE (FLASH_OTP_NV_COUNTERS_SECTOR_SIZE + FLASH_OTP_NV_COUNTERS_SECTOR_SIZE)
+
+/* Secure Storage (PS) Service definitions */
+#define FLASH_PS_AREA_OFFSET (FLASH_OTP_NV_COUNTERS_AREA_OFFSET+FLASH_OTP_NV_COUNTERS_AREA_SIZE)
+#define FLASH_PS_AREA_SIZE (FLASH_AREA_IMAGE_SECTOR_SIZE + FLASH_AREA_IMAGE_SECTOR_SIZE)
+
+/* Control Secure Storage (PS) Service definitions*/
+#if (FLASH_PS_AREA_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_PS_AREA_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* (FLASH_PS_AREA_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+
+/* Internal Trusted Storage (ITS) Service definitions */
+#define FLASH_ITS_AREA_OFFSET (FLASH_PS_AREA_OFFSET+FLASH_PS_AREA_SIZE)
+#define FLASH_ITS_AREA_SIZE (FLASH_AREA_IMAGE_SECTOR_SIZE + FLASH_AREA_IMAGE_SECTOR_SIZE)
+
+/*Control Internal Trusted Storage (ITS) Service definitions */
+#if (FLASH_ITS_AREA_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_ITS_AREA_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* (FLASH_ITS_AREA_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+
+#define FLASH_AREAS_TFM_SIZE (FLASH_OTP_NV_COUNTERS_AREA_SIZE + FLASH_PS_AREA_SIZE + FLASH_ITS_AREA_SIZE)
+#else
+#define FLASH_AREAS_TFM_SIZE (0x0)
+#endif /*(TFM_COMPATIBILTY)*/
 
 /* BL2 partitions size */
 #if  defined(OEMIROT_FIRST_BOOT_STAGE)
@@ -206,8 +269,8 @@
 #endif /* OEMIROT_FIRST_BOOT_STAGE */
 
 #if  defined(OEMIROT_FIRST_BOOT_STAGE)
-/* For OEMIROT_FIRST_BOOT_STAGE we need 64 KB for S partition */
-#define FLASH_S_PARTITION_SIZE          (FLASH_AREA_BL2_SIZE)
+/* For OEMIROT_FIRST_BOOT_STAGE we need 80 KB for S partition */
+#define FLASH_S_PARTITION_SIZE          (OEMIROT_AREA_0_SIZE)
 
 #elif (MCUBOOT_APP_IMAGE_NUMBER == 1) && (FLASH_NS_PARTITION_SIZE == 0)
 /* For FULL SECURE case, we need at least 32 KB for S partition */
@@ -265,8 +328,13 @@
                                          OEMUROT_HASH_REF_SIZE + OEMUROT_BL2_NVCNT_SIZE + \
                                          OEMUROT_SCRATCH_SIZE + OEMUROT_PERSO_SIZE)
 #else /* OEMIROT_FIRST_BOOT_STAGE */
+#if defined(TFM_COMPATIBILTY)
+#define OEMIROT_AREA_0_OFFSET            (FLASH_AREA_BL2_OFFSET)
+#define FLASH_AREA_BEGIN_OFFSET          (FLASH_ITS_AREA_OFFSET + FLASH_ITS_AREA_SIZE)
+#else
 #define OEMIROT_AREA_0_OFFSET           (FLASH_AREA_BL2_OFFSET)
 #define FLASH_AREA_BEGIN_OFFSET         (FLASH_BL2_HDP_END_OFFSET)
+#endif /*(TFM_COMPATIBILTY)*/
 #endif /* OEMIROT_FIRST_BOOT_STAGE */
 
 #define FLASH_AREAS_DEVICE_ID           (FLASH_DEVICE_ID - FLASH_DEVICE_ID)

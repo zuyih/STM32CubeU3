@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Release_Notes</title>
+  <title>Release Notes for STM32 Middleware Mbed TLS Alt</title>
   <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,7 +66,7 @@ how to store AES-CBC key using encrypted ITS.</p>
 cryptography modules:</strong></p>
 <ul>
 <li><code>MBEDTLS_HAL_AES_ALT</code> : to use STM32 hardware AES
-cryptographic accelerator for CBC implementation.</li>
+cryptographic accelerator for AES implementation.</li>
 <li><code>MBEDTLS_HAL_GCM_ALT</code> : to use STM32 hardware AES
 cryptographic accelerator for GCM implementation.</li>
 <li><code>MBEDTLS_HAL_CCM_ALT</code> : to use STM32 hardware AES
@@ -95,12 +95,11 @@ implementation.</li>
 feature for ITS alternative module using imported user key or HUK.</li>
 </ul></li>
 </ul>
-<p><strong><em>NOTE:</em></strong> AES-CBC and AES-GCM support
-protection against side-channel attacks using DPA preprocessor
-symbols:</p>
+<p><strong><em>NOTE:</em></strong> AES supports protection against
+side-channel attacks using DPA preprocessor symbols:</p>
 <ul>
 <li><code>HW_CRYPTO_DPA_AES</code> : to use STM32 hardware SAES
-cryptographic accelerator for DPA AES CBC implementation.</li>
+cryptographic accelerator for DPA AES implementation.</li>
 <li><code>HW_CRYPTO_DPA_GCM</code> : to use STM32 hardware SAES
 cryptographic accelerator for DPA AES GCM implementation.</li>
 </ul>
@@ -125,42 +124,47 @@ implementation</strong></li>
 </thead>
 <tbody>
 <tr class="odd">
-<td>AES (GCM, CBC, CCM)</td>
+<td>AES (ECB, CTR, CBC)</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">YES</td>
 </tr>
 <tr class="even">
+<td>AES (GCM, CCM)</td>
+<td style="text-align: center;">YES</td>
+<td style="text-align: right;">YES</td>
+</tr>
+<tr class="odd">
 <td>ChachaPoly</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">NO</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>ECDH</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">YES</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>ECDSA</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">YES</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>HASH (SHA2, SHA1)</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">YES</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>CMAC</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">NO</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>HMAC</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">YES</td>
 </tr>
-<tr class="even">
-<td>RSA PKCS(v1.5,v2.2)</td>
+<tr class="odd">
+<td>RSA PKCS(v1.5, v2.2)</td>
 <td style="text-align: center;">YES</td>
 <td style="text-align: right;">YES</td>
 </tr>
@@ -208,16 +212,19 @@ VERIFY, Mbed TLS, PSA Crypto API, STM32 Mbed TLS Alt, Encrypted ITS.</p>
 <p><br />
 </p>
 <div class="collapse">
-<input type="checkbox" id="collapse-section2" checked aria-hidden="true">
-<label for="collapse-section2" aria-hidden="true"><strong>V1.1.0 /
-23-January-2025</strong></label>
+<input type="checkbox" id="collapse-section3" checked aria-hidden="true">
+<label for="collapse-section3" aria-hidden="true"><strong>V1.1.1 /
+20-May-2025</strong></label>
 <div>
 <h2 id="main-changes">Main changes</h2>
 <ul>
-<li>Add CCM alternative cryptography implementation</li>
-<li>Add SHA1 alternative cryptography implementation</li>
-<li>Add ITS encryption using the hardware unique key (HUK)</li>
-<li>Path update to interfaces/patterns</li>
+<li>Set prime order size in ecdh compute shared restartable</li>
+<li>Replace error handler in entropy hardware alternative with a return
+status</li>
+<li>Fix the output length in the GCM alternative</li>
+<li>Update the AES CTR alternative to rely on a full hardware
+implementation</li>
+<li>Increase ITS object size</li>
 </ul>
 <h2 id="known-limitations">Known limitations</h2>
 <ul>
@@ -231,19 +238,22 @@ VERIFY, Mbed TLS, PSA Crypto API, STM32 Mbed TLS Alt, Encrypted ITS.</p>
 <ul>
 <li>This component depends on:
 <ul>
-<li>Mbed TLS cryptography library v3.6.2</li>
+<li>Mbed TLS cryptography library version v3.6.2 or higher</li>
 </ul></li>
 </ul>
 </div>
 </div>
 <div class="collapse">
-<input type="checkbox" id="collapse-section1" checked aria-hidden="true">
-<label for="collapse-section1" aria-hidden="true"><strong>V1.0.0 /
-29-October-2024</strong></label>
+<input type="checkbox" id="collapse-section2" aria-hidden="true">
+<label for="collapse-section2" aria-hidden="true"><strong>V1.1.0 /
+23-January-2025</strong></label>
 <div>
 <h2 id="main-changes-1">Main changes</h2>
 <ul>
-<li>First release</li>
+<li>Add CCM alternative cryptography implementation</li>
+<li>Add SHA1 alternative cryptography implementation</li>
+<li>Add ITS encryption using the hardware unique key (HUK)</li>
+<li>Path update to interfaces/patterns</li>
 </ul>
 <h2 id="known-limitations-1">Known limitations</h2>
 <ul>
@@ -254,6 +264,32 @@ VERIFY, Mbed TLS, PSA Crypto API, STM32 Mbed TLS Alt, Encrypted ITS.</p>
 <li>None.</li>
 </ul>
 <h2 id="dependencies-1">Dependencies</h2>
+<ul>
+<li>This component depends on:
+<ul>
+<li>Mbed TLS cryptography library v3.6.2</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="collapse">
+<input type="checkbox" id="collapse-section1" aria-hidden="true">
+<label for="collapse-section1" aria-hidden="true"><strong>V1.0.0 /
+29-October-2024</strong></label>
+<div>
+<h2 id="main-changes-2">Main changes</h2>
+<ul>
+<li>First release</li>
+</ul>
+<h2 id="known-limitations-2">Known limitations</h2>
+<ul>
+<li>None</li>
+</ul>
+<h2 id="backward-compatibility-2">Backward compatibility</h2>
+<ul>
+<li>None.</li>
+</ul>
+<h2 id="dependencies-2">Dependencies</h2>
 <ul>
 <li>This component depends on:
 <ul>

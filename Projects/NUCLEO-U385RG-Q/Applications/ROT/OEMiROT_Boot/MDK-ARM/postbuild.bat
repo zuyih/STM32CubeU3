@@ -435,6 +435,30 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_0_OFFSET -n OEMIROT_AREA_0_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_0_SIZE -n OEMIROT_AREA_0_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_2_OFFSET -n OEMIROT_AREA_2_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_OEMIROT_DOWNLOAD_IMAGE_AREA_2_SIZE -n OEMIROT_AREA_2_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+IF "%oemurot_enabled%" == "1" (
+set "command=%python%%applicfg% setdefine -a uncomment -n OEMUROT_ENABLE -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+) else (
+set "command=%python%%applicfg% setdefine -a comment -n OEMUROT_ENABLE -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+)
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 :: ============================================================ end ============================================================
 exit 0
 

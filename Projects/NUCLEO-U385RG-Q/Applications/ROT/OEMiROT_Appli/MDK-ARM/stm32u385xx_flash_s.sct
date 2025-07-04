@@ -5,9 +5,6 @@
 #define ROM_S_START            S_CODE_START
 #define ROM_S_SIZE             S_CODE_SIZE
 
-#define ROM_NSC_START          NSC_CODE_START
-#define ROM_NSC_SIZE           NSC_CODE_SIZE
-
 #define RAM_S_START            S_RAM_START
 #define RAM_S_SIZE             S_RAM_SIZE
 
@@ -31,11 +28,5 @@ LR_IROM1 ROM_S_START   ROM_S_SIZE {
   }
 
   ARM_LIB_HEAP +0 ALIGN 8 EMPTY S_HEAP_SIZE {
-  }
-}
-
-LR_IROM2 ROM_NSC_START ROM_NSC_SIZE  {
-  ER_IROM2 ROM_NSC_START ROM_NSC_SIZE  {
-   *(Veneer$$CMSE)
   }
 }

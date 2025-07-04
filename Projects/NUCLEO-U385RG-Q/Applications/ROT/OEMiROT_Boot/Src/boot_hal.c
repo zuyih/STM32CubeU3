@@ -395,18 +395,6 @@ void boot_platform_quit(struct boot_arm_vector_table *vector)
 }
 
 /****************************************************************************************/
-#if defined(__GNUC__)
-/* Ensure local variables of this function are not placed in RAM but in
- * registers only, even in case of low compile optimization configuration
- * at project side.
- * - IAR: No need to force compile optimization level.
- * - KEIL: Force high compile optimization on per-file basis.
- * - STM32CUBEIDE: Force high compile optimization on function only.
- *  */
-#if !defined(__ARMCC_VERSION)
-__attribute__((optimize("Os")))
-#endif /* !__ARMCC_VERSION */
-#endif /* __GNUC__ */
 /**
   * @brief This function is called to clear all RAM area before jumping in
   * in Secure application .
@@ -708,12 +696,9 @@ void Error_Handler_rdp(void)
 {
   /* it is customizeable */
   /* an infinite loop,  and a reset for single fault injection */
-#ifdef OEMIROT_ERROR_HANDLER_STOP_EXEC
-  static __IO int twice = 1;
-#else /* OEMIROT_ERROR_HANDLER_STOP_EXEC */
+  
   static __IO int twice = 0;
-#endif /* OEMIROT_ERROR_HANDLER_STOP_EXEC */
-  while (twice);
+  while (!twice);
   NVIC_SystemReset();
 #if !defined(__ICCARM__)
   /* Avoid bx lr instruction (for fault injection) */
@@ -732,11 +717,9 @@ void Error_Handler(void)
   /* it is customizeable */
   /* an infinite loop,  and a reset for single fault injection */
 #ifdef OEMIROT_ERROR_HANDLER_STOP_EXEC
-  static __IO int twice = 1;
-#else /* OEMIROT_ERROR_HANDLER_STOP_EXEC */
   static __IO int twice = 0;
+  while (!twice);
 #endif /* OEMIROT_ERROR_HANDLER_STOP_EXEC */
-  while (twice);
   NVIC_SystemReset();
 #if !defined(__ICCARM__)
   /* Avoid bx lr instruction (for fault injection) */

@@ -53,14 +53,14 @@ extern "C" {
 #define COM_UART_CLK_DISABLE()                  __HAL_RCC_USART1_CLK_DISABLE()
 
 #define COM_UART_TX_AF                          GPIO_AF7_USART1
-#define COM_UART_TX_GPIO_PORT                   GPIOB
-#define COM_UART_TX_PIN                         GPIO_PIN_12
-#define COM_UART_TX_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE()
-#define COM_UART_TX_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE()
+#define COM_UART_TX_GPIO_PORT                   GPIOA
+#define COM_UART_TX_PIN                         GPIO_PIN_9
+#define COM_UART_TX_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
+#define COM_UART_TX_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
 
 #define COM_UART_RX_AF                          GPIO_AF7_USART1
 #define COM_UART_RX_GPIO_PORT                   GPIOA
-#define COM_UART_RX_PIN                         GPIO_PIN_8
+#define COM_UART_RX_PIN                         GPIO_PIN_10
 #define COM_UART_RX_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
 #define COM_UART_RX_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
 

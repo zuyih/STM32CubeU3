@@ -501,6 +501,9 @@ int mbedtls_gcm_update(mbedtls_gcm_context *ctx,
   __ALIGN_BEGIN unsigned char work_buf[16] __ALIGN_END;
   uint16_t work_buf_len = 0;
 #endif /* HW_CRYPTO_DPA_CTR_FOR_GCM */
+  size_t tmp_lenght = 0;
+
+  tmp_lenght = ctx->len;
 
   if ((output > input) && ((size_t)(output - input) < input_length))
   {
@@ -650,7 +653,7 @@ exit:
 
 #endif /* HW_CRYPTO_DPA_CTR_FOR_GCM */
 
-  *output_length = input_length;
+  *output_length = ctx->len - tmp_lenght;
 
   /* allow multi-context of CRYP : save context */
   ctx->ctx_save_cr = ctx->hcryp_gcm.Instance->CR;

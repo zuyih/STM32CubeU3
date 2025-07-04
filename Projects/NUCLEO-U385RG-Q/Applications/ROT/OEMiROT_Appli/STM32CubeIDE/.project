@@ -25,7 +25,7 @@
 		<nature>com.st.stm32cube.ide.mcu.MCUNonUnderRootProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUCubeExampleProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUEndUserDisabledTrustZoneProjectNature</nature>
-		<nature>com.st.stm32cube.ide.mcu.MCUSecureProjectNature</nature>
+		<nature>com.st.stm32cube.ide.mcu.MCUNonSecureProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUSingleCpuProjectNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
@@ -80,11 +80,6 @@
 			<name>Application/User/ymodem.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/ymodem.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/secure_nsc.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/secure_nsc.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32u3xx.c</name>
@@ -176,5 +171,5 @@
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Drivers/STM32U3xx_HAL_Driver/Src/stm32u3xx_hal_uart_ex.c</locationURI>
 		</link>
-    </linkedResources>
+	</linkedResources>
 </projectDescription>

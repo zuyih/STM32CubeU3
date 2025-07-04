@@ -472,6 +472,10 @@ psa_status_t mbedtls_kwe_opaque_import_key(
         }
       }
     }
+
+    /* Free ECP context */
+    mbedtls_ecp_keypair_free(ecp);
+    mbedtls_free(ecp);
   }
   else
 #endif /* MBEDTLS_ECDSA_C || MBEDTLS_ECDH_C */
@@ -725,6 +729,10 @@ psa_status_t mbedtls_kwe_opaque_export_public_key(
 
     status = kwe_to_psa_error(KWE_EcdsaPublicKeyExport(&ecp_tmp, p_key,
                                                        p_data, data_size, p_data_length));
+    /* Free ECP context */
+    mbedtls_ecp_keypair_free(ecp);
+    mbedtls_free(ecp);
+
     if (status != PSA_SUCCESS)
     {
       return status;
@@ -831,9 +839,14 @@ psa_status_t mbedtls_kwe_opaque_key_agreement(
     {
       status = PSA_ERROR_CORRUPTION_DETECTED;
     }
+
+    /* Free ECP context */
+    mbedtls_ecp_keypair_free(ecp);
+    mbedtls_free(ecp);
+
   }
   else
-#endif /* MBEDTLS_PSA_BUILTIN_ALG_ECDH */
+#endif /* MBEDTLS_ECDH_C */
 
   {
     status =  PSA_ERROR_NOT_SUPPORTED;
@@ -946,6 +959,10 @@ psa_status_t mbedtls_kwe_opaque_signature_sign_hash(
                                signature_size, p_signature_length);
 
     mbedtls_zeroize_and_free(p_digest, (ecp_tmp.order_size));
+
+    /* Free ECP context */
+    mbedtls_ecp_keypair_free(ecp);
+    mbedtls_free(ecp);
 
     if (status != PSA_SUCCESS)
     {

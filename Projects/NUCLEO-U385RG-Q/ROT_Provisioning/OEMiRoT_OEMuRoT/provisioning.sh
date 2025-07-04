@@ -26,6 +26,7 @@ oem2_password="./Keys/oem2_password.txt"
 # Log files
 ob_flash_log="ob_flash_programming.log"
 provisioning_log="provisioning.log"
+rm -rf *.log
 
 applicfg="$cube_fw_path/Utilities/PC_Software/ROT_AppliConfig/dist/AppliCfg.exe"
 uname | grep -i -e windows -e mingw
@@ -43,7 +44,7 @@ fi
 
 # Display Boot path
 echo "====="
-echo "===== Provisioning of OEMiROT_OEMuRoT boot path"
+echo "===== Provisioning of OEMiRoT_OEMuRoT boot path"
 echo "===== Application selected through env.sh:"
 echo "=====" $oemirot_appli_path_project
 echo "====="
@@ -136,6 +137,7 @@ set_oem2_key()
     # Step to configure OEM2 key
     echo "   * OEM2 key setup"
     echo "       Open oem2_password file and put OEM2 key(Default path is \ROT_Provisioning\OEMiRoT_OEMuRoT\Keys\oem2_password.txt)"
+    echo "       Warning: Default OEM2 keys must NOT be used in a product. Make sure to regenerate your own OEM2 keys!"
     echo "       Press any key to continue..."
     echo
     if [ "$mode" != "AUTO" ]; then read -p "" -n1 -s; fi
@@ -179,7 +181,7 @@ images_generation()
     echo
     echo "   * OEMuROT Boot firmware image generation"
     echo "       Open the OEMiROT_Boot project with preferred toolchain and rebuild all files."
-    echo "       At this step the project is configured for OEMIROT_OEMuROT boot path as OEMuRoT."
+    echo "       At this step the project is configured for OEMiRoT_OEMuROT boot path as OEMuRoT."
     echo "       Press any key to continue..."
     echo
     if [ "$mode" != "AUTO" ]; then read -p "" -n1 -s; fi
@@ -207,11 +209,18 @@ images_generation()
     if [ $ret != "0" ]; then step_error; fi
 
     echo "   * Code firmware image generation"
-    echo "       Open the OEMiROT_Appli_TrustZone project with preferred toolchain."
-    echo "       Rebuild all files. The oemirot_tz_app_enc_sign.bin file(s) is generated with the postbuild command."
+    if [ "$app_full_secure" == "1" ]; then
+      echo "       Open the OEMiROT_Appli project with preferred toolchain."
+      echo "       Rebuild the Secure project. The $oemurot_appli_secure and oemurot_tz_s_app_enc_sign.bin files are generated with the postbuild command."
+    else
+      echo "       Open the OEMiROT_Appli_TrustZone project with preferred toolchain."
+      echo "       Rebuild the Secure project. The $oemurot_appli_secure and oemurot_tz_s_app_enc_sign.bin files are generated with the postbuild command."
+      echo "       Rebuild the NonSecure project. The $oemurot_appli_non_secure and oemurot_tz_ns_app_enc_sign.bin files are generated with the postbuild command."
+    fi
     echo "       Press any key to continue..."
     echo
     if [ "$mode" != "AUTO" ]; then read -p "" -n1 -s; fi
+
     echo "   * Data secure generation (if Data secure image is enabled)"
     echo "       Select OEMuRoT_S_Data_Image.xml(Default path is /ROT_Provisioning/OEMiRoT_OEMuRoT/Images/OEMuROT_S_Data_Image.xml)"
     echo "       Generate the data_enc_sign.bin image"
@@ -258,7 +267,7 @@ oem2_key_provisioning()
     # Get OEM2 key
     read -r oem2_key < "$oem2_password"
 
-    action="Programming oem2 password"
+    action="Provisioning oem2 password"
     "$stm32programmercli" $connect_reset -hardRst -lockRDP2 $oem2_key >> $provisioning_log 2>&1
     if [ $? != 0 ]; then step_error; fi
     echo "   * Provisioning of OEM2 key Done"
@@ -269,7 +278,7 @@ ob_programming()
 {
     action="Programming the option bytes and flashing the images..."
     current_log_file=$ob_flash_log
-    command="source $ob_flash_programming AUTO"
+    command="source $ob_flash_programming AUTO $RDP_level"
     echo "   * $action"
     $command > "$current_log_file"
 

@@ -12,6 +12,9 @@ triggered by HSE ready.
 - LD2 is toggled with a timing of 1 second in case of error to switch SYSCLK to HSE or if HSE CSS
 failure is detected (through NMI IT).
 
+#### <b>Notes</b>
+
+Make sure to mount an HSE quartz oscillator on the X2 solder bridge of the board
 
 #### <b>Keywords</b>
 

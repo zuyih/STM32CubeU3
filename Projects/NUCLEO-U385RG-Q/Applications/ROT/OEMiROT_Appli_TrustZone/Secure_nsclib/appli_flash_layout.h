@@ -41,6 +41,9 @@
 
 /********** All define are updated automatically from ROT_BOOT project : begin **********/
 
+/*#define OEMUROT_ENABLE*/                          /* Defined: the project is used for OEMuRoT boot stage
+                                                   Undefined: the project is used for OEMiRoT boot stage */
+
 #define MCUBOOT_OVERWRITE_ONLY                  /* Defined: the FW installation uses overwrite method.
                                                    UnDefined: The FW installation uses swap mode. */
 
@@ -96,6 +99,14 @@
 #define FLASH_NS_DATA_PARTITION_SIZE   0x0      /* non secure data partition size */
 
 #define FLASH_B_SIZE                   0x80000  /* flash bank size: 1 MBytes*/
+
+#define OEMIROT_AREA_0_OFFSET          0x0   /* Secure app image primary slot for OEMuRoT boot stage */
+
+#define OEMIROT_AREA_0_SIZE            0x0   /* Secure app image primary slot size for OEMuRoT boot stage */
+
+#define OEMIROT_AREA_2_OFFSET          0x0   /* Secure app image secondary slot for OEMuRoT boot stage */
+
+#define OEMIROT_AREA_2_SIZE            0x0   /* Secure app image secondary slot size for OEMuRoT boot stage */
 
 /********** All define are updated automatically from ROT_BOOT project : End **********/
 

@@ -1295,6 +1295,9 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\bl2\ext\mcuboot\bl2_main.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\boot_record.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\bootutil_misc.c</name>
             </file>
             <file>
@@ -1332,6 +1335,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\bl2\src\security_cnt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\bl2\src\shared_data.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\swap_misc.c</name>

@@ -29,7 +29,7 @@
 #include "s_data.h"
 #include "Driver_Flash.h"
 
-extern ARM_DRIVER_FLASH LOADER_FLASH_DEV_NAME;
+extern ARM_DRIVER_FLASH FLASH_DEV_NAME;
 
 /* Avoids the semihosting issue */
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
@@ -184,21 +184,6 @@ int main(void)
 #endif /* GPIOF */
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
-  HAL_GPIO_ConfigPinAttributes(GPIOA, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-  HAL_GPIO_ConfigPinAttributes(GPIOB, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-  HAL_GPIO_ConfigPinAttributes(GPIOC, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-  HAL_GPIO_ConfigPinAttributes(GPIOD, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-  HAL_GPIO_ConfigPinAttributes(GPIOE, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-#ifdef GPIOF
-  HAL_GPIO_ConfigPinAttributes(GPIOF, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-#endif /* GPIOF */
-  HAL_GPIO_ConfigPinAttributes(GPIOG, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-  HAL_GPIO_ConfigPinAttributes(GPIOH, GPIO_PIN_ALL, GPIO_PIN_NSEC);
-
-  /* remove from NonSecure the PIN reserved for Secure */
-  HAL_GPIO_ConfigPinAttributes(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SEC);
-  HAL_GPIO_ConfigPinAttributes(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SEC);
-  /* Leave the GPIO clocks enabled to let non-secure having I/Os control */
 
   /* Secure SysTick should rather be suspended before calling non-secure  */
   /* in order to avoid wake-up from sleep mode entered by non-secure      */
@@ -214,7 +199,7 @@ int main(void)
   printf("\r\n======================================================================");
   printf("\r\n\r\n");
 
-  if ( LOADER_FLASH_DEV_NAME.Initialize(NULL) != ARM_DRIVER_OK)
+  if ( FLASH_DEV_NAME.Initialize(NULL) != ARM_DRIVER_OK)
   {
     printf("Driver Flash Init : Failed");
   }
@@ -236,9 +221,9 @@ int main(void)
 void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n======================== Main Menu ========================\r\n\n");
-  printf("  New Secure Firmware Image ----------------------------- 2\r\n\n");
+  printf("  New Secure Firmware Image ----------------------------- 1\r\n\n");
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-  printf("  Display Secure Data ----------------------------------- 3\r\n\n");
+  printf("  Display Secure Data ----------------------------------- 2\r\n\n");
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
   printf("  Selection :\r\n\n");
 }
@@ -266,12 +251,12 @@ void FW_APP_Run(void)
       switch (key)
       {
 #if (MCUBOOT_PRIMARY_ONLY == 0)
-        case '2' :
+        case '1' :
           FW_UPDATE_Run();
           break;
 #endif /* (PRIMARY_ONLY == 0) */
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-        case '3' :
+        case '2' :
           S_DATA_Run();
           break;
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */

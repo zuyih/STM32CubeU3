@@ -24,6 +24,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32_hal.h"
+#include "flash_layout.h"
 
 /* RTC clock */
 #define  RTC_CLOCK_SOURCE_LSI
@@ -44,27 +45,24 @@
 #define OEMIROT_HDP_PROTECT_ENABLE /*!< HDP protection   */
 #define OEMIROT_SECURE_USER_SRAM2_ERASE_AT_RESET /*!< SRAM2 clear at Reset  */
 
-#ifdef OEMIROT_DEV_MODE
-#define OEMIROT_OB_RDP_LEVEL_VALUE OB_RDP_LEVEL_0 /*!< RDP level */
-#else
-#define OEMIROT_OB_RDP_LEVEL_VALUE OB_RDP_LEVEL_2 /*!< RDP level */
-#endif /* OEMIROT_DEV_MODE */
-
 #define NO_TAMPER            (0)                /*!< No tamper activated */
 #define INTERNAL_TAMPER_ONLY (1)                /*!< Only Internal tamper activated */
 #define ALL_TAMPER           (2)                /*!< Internal and External tamper activated */
 #define OEMIROT_TAMPER_ENABLE INTERNAL_TAMPER_ONLY            /*!< TAMPER configuration flag  */
 
-#ifdef OEMIROT_DEV_MODE
-#define OEMIROT_ERROR_HANDLER_STOP_EXEC /*!< Error handler stops execution (else it resets) */
-#define OEMIROT_OB_BOOT_LOCK 1 /*!< BOOT Lock expected value  */
-#else
-#define OEMIROT_WRP_LOCK_ENABLE /*!< Write Protection Lock */
+#define OEMIROT_OB_RDP_LEVEL_VALUE OB_RDP_LEVEL_0 /*!< RDP level value here is automatically configured by provisioning script according to user choice */
 #define OEMIROT_OB_BOOT_LOCK 1 /*!< BOOT Lock expected value  */
 
-#if  (OEMIROT_OB_RDP_LEVEL_VALUE == OB_RDP_LEVEL_0_5)
+#if (OEMIROT_OB_RDP_LEVEL_VALUE != OB_RDP_LEVEL_0)
+#define OEMIROT_WRP_LOCK_ENABLE /*!< Write Protection Lock enabled when RDP level not equal to zero */
+#endif /* (OEMIROT_OB_RDP_LEVEL_VALUE != OB_RDP_LEVEL_0) */
+
+#ifdef OEMIROT_DEV_MODE
+#define OEMIROT_ERROR_HANDLER_STOP_EXEC /*!< Error handler stops execution (else it resets) */
+#elif  (OEMIROT_OB_RDP_LEVEL_VALUE == OB_RDP_LEVEL_0_5)
 #error "RDP 0.5 is not allowed in production mode (OEMIROT_DEV_MODE undefined)"
-#endif /* (OEMIROT_OB_RDP_LEVEL_VALUE == OB_RDP_LEVEL_0_5) */
+#elif !defined(OEMUROT_ENABLE)
+#define OEMIROT_NSBOOT_CHECK_ENABLE  /*!<  NSBOOTADD0 and NSBOOTADD1 must be set to OEMiROT_Boot Vector  */
 #endif /* OEMIROT_DEV_MODE */
 
 /* Run time protections */
@@ -72,7 +70,7 @@
 #define OEMIROT_BOOT_MPU_PROTECTION    /*!< OEMiROT_Boot uses MPU to prevent execution outside of OEMiROT_Boot code  */
 
 /* Fast wake-up from low power */
-/* #define OEMIROT_FAST_WAKE_UP */          /*!< Enable fast wake-up from low power: bypass images control */
+#define OEMIROT_FAST_WAKE_UP           /*!< Enable fast wake-up from low power: bypass images control */
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum
