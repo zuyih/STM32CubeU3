@@ -509,7 +509,7 @@ KWE_StatusTypeDef KWE_EcdsaPublicKeyExport(
 
   p_public_key[0]                    = 0x04;
   publickey.pPointX                  = p_public_key + 1;
-  publickey.pPointY                  = p_public_key + 1 + (public_key_size / 2U);
+  publickey.pPointY                  = p_public_key + 1 + ecdsa_param.primeOrderSizeByte;
 
 #else /* To Do */
   *p_public_key_length               = ecdsa_param.primeOrderSizeByte;
@@ -683,7 +683,7 @@ KWE_StatusTypeDef KWE_EcdsaSignHash(
   ecdsa_blob.pWrappedKey = (uint32_t *)p_key_buffer + KWE_BLOB_KEY_OFFSET;
 
   ecdsa_result.pRSign                      = p_signature;
-  ecdsa_result.pSSign                      = p_signature + signature_size / 2U;
+  ecdsa_result.pSSign                      = p_signature + ecdsa_param.primeOrderSizeByte;
 
   if (HAL_CCB_ECDSA_Sign(&hccb, &ecdsa_param, &wrapping_key_conf, &ecdsa_blob, p_hash_tmp, &ecdsa_result) != HAL_OK)
   {
@@ -1028,7 +1028,7 @@ KWE_StatusTypeDef KWE_AesAeadEncrypt(
   uint32_t i = 0;
   size_t len_left = 0;
   unsigned int q = 0;
-  
+
   unsigned char *b1_padded_addr = NULL;            /* Formatting of B1   */
   size_t b1_length = 0;                                /* B1 with padding    */
   uint8_t b1_padding = 0;                              /* B1 word alignment  */
@@ -1059,7 +1059,7 @@ KWE_StatusTypeDef KWE_AesAeadEncrypt(
     conf.HeaderWidthUnit = CRYP_HEADERWIDTHUNIT_BYTE;
     if (additional_data_length != 0U)
     {
-      if (alg == KWE_ALG_AES_GCM) 
+      if (alg == KWE_ALG_AES_GCM)
       {
         /* Set Initialization vector (IV) in Little endian format */
         for (i = 0; i < (nonce_length / 4U); i++)
@@ -1087,7 +1087,7 @@ KWE_StatusTypeDef KWE_AesAeadEncrypt(
         init_vect[0] |= (additional_data_length > 0U) << 6U;
         init_vect[0] |= ((tag_length - 2U) / 2U) << 3U;
         init_vect[0] |= q - 1U;
-        
+
         for (i = 0, len_left = plaintext_length; i < q; i++, len_left >>= 8U)
         {
           init_vect[15 - i] = (uint8_t)((len_left)& 0xff);
@@ -1251,7 +1251,7 @@ KWE_StatusTypeDef KWE_AesAeadDecrypt(
   uint32_t i = 0;
   size_t len_left = 0;
   unsigned int q = 0;
-  
+
   unsigned char *b1_padded_addr = NULL;            /* Formatting of B1   */
   size_t b1_length = 0;                                /* B1 with padding    */
   uint8_t b1_padding = 0;                              /* B1 word alignment  */
@@ -1280,7 +1280,7 @@ KWE_StatusTypeDef KWE_AesAeadDecrypt(
     conf.HeaderWidthUnit = CRYP_HEADERWIDTHUNIT_BYTE;
     if (additional_data_length != 0U)
     {
-      if (alg == KWE_ALG_AES_GCM) 
+      if (alg == KWE_ALG_AES_GCM)
       {
         /* Set Initialization vector (IV) in Little endian format */
         for (i = 0; i < (nonce_length / 4U); i++)
@@ -1308,7 +1308,7 @@ KWE_StatusTypeDef KWE_AesAeadDecrypt(
         init_vect[0] |= (additional_data_length > 0U) << 6U;
         init_vect[0] |= ((tag_length - 2U) / 2U) << 3U;
         init_vect[0] |= q - 1U;
-        
+
         for (i = 0U, len_left = (ciphertext_length - tag_length); i < q; i++, len_left >>= 8U)
         {
           init_vect[15U - i] = (uint8_t)((len_left)& 0xff);
